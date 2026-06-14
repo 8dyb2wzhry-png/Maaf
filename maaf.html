@@ -1,0 +1,976 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Rea - Sebuah Perjalanan Cinta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-soft: #B5D8EB;
+            --blue-deep: #7BB2D9;
+            --pink-soft: #FDE2E4;
+            --pink-deep: #F1A7B8;
+            --white-glass: rgba(255, 255, 255, 0.75);
+            --text-dark: #4A4A68;
+            --text-light: #7B7B9E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            /* Romantic Twilight Gradient */
+            background: linear-gradient(135deg, #E0C3FC 0%, #8EC5FC 100%);
+            background-attachment: fixed;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: var(--white-glass);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 15px 35px rgba(123, 178, 217, 0.2);
+            width: 100%;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 56px);
+            color: var(--blue-deep);
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-light);
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+
+        .game-box {
+            background: var(--white-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.4s ease;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+
+        .game-box.active {
+            opacity: 1;
+            pointer-events: auto;
+            filter: grayscale(0);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(241, 167, 184, 0.3);
+            border: 2px solid var(--pink-soft);
+        }
+
+        .game-box.completed {
+            opacity: 0.8;
+            pointer-events: none;
+            filter: grayscale(0);
+            border: 2px solid var(--blue-soft);
+        }
+
+        .game-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blue-deep);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(123, 178, 217, 0.4);
+        }
+
+        .game-box.active .game-badge { background: var(--pink-deep); }
+        .game-box.completed .game-badge { background: var(--blue-soft); color: var(--text-dark); }
+
+        .game-title {
+            font-size: 22px;
+            color: var(--blue-deep);
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .game-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .game-area {
+            background: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- SPECIFIC GAME STYLES --- */
+        
+        /* G1: Rasi Bintang */
+        #g1-canvas { background: #1a1a2e; border-radius: 12px; cursor: pointer; }
+        
+        /* G2: Tebak Hati */
+        .cup-container { display: flex; gap: 15px; }
+        .cup { font-size: 40px; cursor: pointer; transition: transform 0.3s; }
+        .cup:hover { transform: translateY(-5px); }
+        
+        /* G3: Susun Kata */
+        .word-slot-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px;}
+        .word-slot { width: 70px; height: 35px; border: 2px dashed var(--pink-deep); border-radius: 8px; }
+        .word-piece { background: var(--pink-soft); color: var(--pink-deep); padding: 5px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; border: 1px solid var(--pink-deep); }
+        
+        /* G4: Hangatkan Hati */
+        #g4-heart { font-size: 70px; color: var(--blue-soft); filter: grayscale(1); transition: filter 0.1s; cursor: pointer; user-select: none; }
+        
+        /* G5: Gembok Cinta */
+        .lock-container { display: flex; gap: 10px; }
+        .lock-dial { width: 50px; height: 60px; font-size: 24px; text-align: center; border: 2px solid var(--blue-deep); border-radius: 12px; outline: none; background: white; color: var(--blue-deep); font-weight: bold; }
+        
+        /* G6: Rhythm */
+        .beat-circle { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--pink-soft); display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative;}
+        .beat-pulse { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--pink-deep); animation: pulseBeat 2s infinite; }
+        
+        /* G7: Tangkap Kenangan */
+        .catch-area { width: 100%; height: 150px; position: relative; overflow: hidden; background: #f0f8ff; border-radius: 12px; }
+        .falling-item { position: absolute; font-size: 24px; cursor: pointer; animation: fallItem linear forwards; }
+        
+        /* G8: Hati Tersambung (Wires) */
+        .wire-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .wire-tile { width: 50px; height: 50px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: transform 0.3s; }
+        
+        /* G9: Memori yang Pudar */
+        .fade-text { font-size: 14px; color: var(--blue-deep); font-weight: 500; opacity: 0.1; transition: opacity 0.5s; cursor: pointer; user-select:none;     -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
+        
+        /* G10: Tombol Lari */
+        #g10-btn-no { position: relative; transition: all 0.2s; }
+        
+        /* Buttons */
+        .btn {
+            background: linear-gradient(45deg, var(--blue-deep), var(--pink-deep));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.2s;
+            margin-top: 15px;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        /* Modals (Pop-ups) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.4s;
+            padding: 20px;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: white; border-radius: 30px; padding: 40px;
+            text-align: center; max-width: 400px; width: 100%;
+            transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-overlay.show .modal-box { transform: scale(1); }
+
+        .modal-icon { font-size: 60px; margin-bottom: 20px; }
+        .modal-title { font-size: 24px; color: var(--blue-deep); margin-bottom: 10px; }
+        .modal-text { font-size: 15px; color: var(--text-light); line-height: 1.6; margin-bottom: 25px; }
+
+        /* Final Love Letter */
+        .letter-container {
+            background: #fffafa; padding: 50px; border-radius: 20px;
+            max-width: 600px; width: 100%; text-align: left;
+            border: 2px solid var(--pink-soft);
+            box-shadow: inset 0 0 20px rgba(241, 167, 184, 0.1);
+            max-height: 85vh; overflow-y: auto;
+        }
+        .letter-title { color: var(--pink-deep); font-size: 36px; margin-bottom: 20px; text-align: center; border-bottom: 2px dashed var(--pink-soft); padding-bottom: 15px;}
+        .letter-content p { margin-bottom: 15px; font-size: 16px; line-height: 1.8; color: #5a5a5a; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseBeat { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+        @keyframes fallItem { to { transform: translateY(200px); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div class="hero">
+            <h1 class="serif">Untuk Rea</h1>
+            <p>Sebuah perjalanan kecil untuk memperbaiki kesalahan. Selesaikan 10 tantangan romantis ini secara berurutan untuk membuka isi hatiku yang sesungguhnya.</p>
+            <p style="margin-top: 15px; font-size: 12px; color: var(--blue-deep); font-weight: bold;">(Ketuk di mana saja untuk menyalakan musik)</p>
+        </div>
+
+        <div class="game-grid">
+            
+            <!-- G1 -->
+            <div class="game-box active" id="game-1">
+                <div class="game-badge">Tantangan 1</div>
+                <h2 class="game-title serif">Rasi Bintang Kita</h2>
+                <p class="game-desc">Hubungkan bintang-bintang secara berurutan (1 sampai 5) untuk membentuk sesuatu yang indah.</p>
+                <div class="game-area">
+                    <canvas id="g1-canvas" width="200" height="150"></canvas>
+                </div>
+            </div>
+
+            <!-- G2 -->
+            <div class="game-box" id="game-2">
+                <div class="game-badge">Tantangan 2</div>
+                <h2 class="game-title serif">Cari Hatiku</h2>
+                <p class="game-desc">Di bunga mana aku menitipkan hatiku? Pilih dengan hati-hati.</p>
+                <div class="game-area">
+                    <div class="cup-container" id="g2-cups">
+                        <div class="cup">🌷</div><div class="cup">🌷</div><div class="cup">🌷</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G3 -->
+            <div class="game-box" id="game-3">
+                <div class="game-badge">Tantangan 3</div>
+                <h2 class="game-title serif">Susun Perasaan</h2>
+                <p class="game-desc">Klik kata-kata di bawah ini secara berurutan untuk membentuk kalimat yang benar.</p>
+                <div class="game-area">
+                    <div class="word-slot-container" id="g3-slots">
+                        <div class="word-slot" id="slot-1"></div><div class="word-slot" id="slot-2"></div>
+                        <div class="word-slot" id="slot-3"></div><div class="word-slot" id="slot-4"></div>
+                    </div>
+                    <div class="word-slot-container" id="g3-words">
+                        <div class="word-piece">Hanya</div><div class="word-piece">Kamu</div>
+                        <div class="word-piece">Cintaku</div><div class="word-piece">Satu</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G4 -->
+            <div class="game-box" id="game-4">
+                <div class="game-badge">Tantangan 4</div>
+                <h2 class="game-title serif">Hangatkan Hati</h2>
+                <p class="game-desc">Usap (gesek) hati yang membeku ini berulang kali hingga warnanya kembali merona.</p>
+                <div class="game-area">
+                    <div id="g4-heart">💙</div>
+                    <div style="margin-top: 10px; font-size: 12px; color: var(--pink-deep);" id="g4-progress">0%</div>
+                </div>
+            </div>
+
+            <!-- G5 -->
+            <div class="game-box" id="game-5">
+                <div class="game-badge">Tantangan 5</div>
+                <h2 class="game-title serif">Kode Cinta</h2>
+                <p class="game-desc">Masukkan 3 digit angka yang berarti "I Love You".</p>
+                <div class="game-area">
+                    <div class="lock-container">
+                        <input type="number" class="lock-dial" id="d1" min="0" max="9" value="0">
+                        <input type="number" class="lock-dial" id="d2" min="0" max="9" value="0">
+                        <input type="number" class="lock-dial" id="d3" min="0" max="9" value="0">
+                    </div>
+                    <button class="btn" onclick="checkG5()">Buka</button>
+                </div>
+            </div>
+
+            <!-- G6 -->
+            <div class="game-box" id="game-6">
+                <div class="game-badge">Tantangan 6</div>
+                <h2 class="game-title serif">Detak Harmoni</h2>
+                <p class="game-desc">Klik tepat saat lingkaran meluas untuk menyamakan detak jantung kita (3 kali).</p>
+                <div class="game-area">
+                    <div class="beat-circle" id="g6-circle" onclick="tapG6()">
+                        <div class="beat-pulse" id="g6-pulse"></div>
+                        💓
+                    </div>
+                    <div style="margin-top: 15px; font-weight: bold; color: var(--pink-deep);" id="g6-score">0 / 3</div>
+                </div>
+            </div>
+
+            <!-- G7 -->
+            <div class="game-box" id="game-7">
+                <div class="game-badge">Tantangan 7</div>
+                <h2 class="game-title serif">Kenangan Indah</h2>
+                <p class="game-desc">Tangkap 5 bintang (✨), hindari awan mendung (☁️).</p>
+                <div class="game-area catch-area" id="g7-area">
+                    <button class="btn" id="g7-start" style="position: absolute; z-index: 10;">Mulai Bermain</button>
+                    <div style="position: absolute; top: 5px; right: 10px; font-weight: bold; color: var(--blue-deep); z-index:5;" id="g7-score">0 / 5</div>
+                </div>
+            </div>
+
+            <!-- G8 -->
+            <div class="game-box" id="game-8">
+                <div class="game-badge">Tantangan 8</div>
+                <h2 class="game-title serif">Arahkan ke Rea</h2>
+                <p class="game-desc">Klik ubin untuk merotasi jalurnya, sambungkan pita pink dari kiri ke kanan.</p>
+                <div class="game-area">
+                    <div class="wire-grid" id="g8-grid">
+                        <div class="wire-tile" style="transform: rotate(90deg)">🎀</div>
+                        <div class="wire-tile" style="transform: rotate(0deg)">🎀</div>
+                        <div class="wire-tile" style="transform: rotate(180deg)">🎀</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G9 -->
+            <div class="game-box" id="game-9">
+                <div class="game-badge">Tantangan 9</div>
+                <h2 class="game-title serif">Ingatan Pudar</h2>
+                <p class="game-desc">Klik dan tahan teks yang pudar ini untuk mengingatnya kembali.</p>
+                <div class="game-area">
+                    <div class="fade-text" id="g9-text">"Kamu adalah rumahku."</div>
+                </div>
+            </div>
+
+            <!-- G10 -->
+            <div class="game-box" id="game-10">
+                <div class="game-badge">Tantangan Akhir</div>
+                <h2 class="game-title serif">Satu Kesempatan</h2>
+                <p class="game-desc">Setelah semua ini, maukah kamu mendengarkan penjelasanku?</p>
+                <div class="game-area" style="flex-direction: row; gap: 20px;">
+                    <button class="btn" onclick="winGame(10)">Iya, Boleh</button>
+                    <button class="btn" style="background: #ccc; color: #666;" id="g10-btn-no">Nggak</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Error Modal -->
+    <div class="modal-overlay" id="modal-error">
+        <div class="modal-box">
+            <div class="modal-icon">🥺</div>
+            <h3 class="modal-title serif">Oops...</h3>
+            <p class="modal-text" id="error-msg">Kayaknya ada yang salah sedikit sayang, coba lagi ya?</p>
+            <button class="btn" onclick="closeModals()">Coba Lagi</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="modal-success">
+        <div class="modal-box">
+            <div class="modal-icon" id="success-icon">🌹</div>
+            <h3 class="modal-title serif">Berhasil!</h3>
+            <p class="modal-text" id="success-msg">Pesan romantis di sini.</p>
+            <button class="btn" onclick="nextGame()">Lanjut</button>
+        </div>
+    </div>
+
+    <!-- Final Love Letter Modal -->
+    <div class="modal-overlay" id="modal-final">
+        <div class="letter-container">
+            <h2 class="letter-title serif">Untuk Rea, Cintaku</h2>
+            <div class="letter-content">
+                <p>Hai Rea...</p>
+                <p>Kalau kamu membaca ini, berarti kamu sudah melewati semua tantangan kecil yang kubuat. Terima kasih sudah bersabar, bukan hanya untuk game ini, tapi juga untuk menghadapiku selama ini.</p>
+                <p>Aku membuat halaman ini karena aku sadar, kata 'maaf' saja mungkin terdengar biasa. Aku ingin menunjukkan usahaku, meski ini mungkin tidak seberapa dibandingkan dengan rasa kecewa yang kamu rasakan karena sikapku.</p>
+                <p>Rea, warna biru dan pink di sini adalah pengingat bahwa dua hal yang berbeda bisa menyatu menjadi sebuah gradasi yang sangat indah—seperti kita. Terkadang aku salah paham, terkadang aku egois, tapi satu hal yang tidak pernah berubah: <b>perasaanku padamu.</b></p>
+                <p>Aku janji akan lebih banyak mendengarkan, lebih banyak mengerti, dan menjadikanmu prioritas. Aku tidak ingin kehilangan sosok yang membuat hariku selalu punya arti.</p>
+                <p>Maafkan aku ya, Rea? Beri aku satu kesempatan lagi untuk membuktikan bahwa aku bisa menjadi pasangan yang kamu banggakan.</p>
+                <p style="text-align: right; margin-top: 30px; font-style: italic; color: var(--pink-deep);">Selalu menyayangimu,<br>Dari orang yang tak ingin kehilanganmu.</p>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="document.getElementById('modal-final').classList.remove('show')">Tutup Surat</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let currentGame = 1;
+        let audioInit = false;
+
+        // --- AUDIO SYSTEM (Web Audio API) ---
+        let audioCtx;
+        function initAudio() {
+            if(audioInit) return;
+            audioInit = true;
+            
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.05; // Very soft
+            masterGain.connect(audioCtx.destination);
+
+            // Create a romantic ambient pad using Sine waves
+            const chords = [
+                [261.63, 329.63, 392.00], // C major
+                [220.00, 261.63, 329.63], // A minor
+                [174.61, 220.00, 261.63], // F major
+                [196.00, 246.94, 293.66]  // G major
+            ];
+            
+            let chordIndex = 0;
+            
+            function playPad() {
+                const now = audioCtx.currentTime;
+                const freqArray = chords[chordIndex];
+                
+                freqArray.forEach(freq => {
+                    const osc = audioCtx.createOscillator();
+                    const oscGain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    oscGain.gain.setValueAtTime(0, now);
+                    oscGain.gain.linearRampToValueAtTime(0.3, now + 2); // Fade in
+                    oscGain.gain.linearRampToValueAtTime(0, now + 6);   // Fade out
+                    
+                    osc.connect(oscGain);
+                    oscGain.connect(masterGain);
+                    
+                    osc.start(now);
+                    osc.stop(now + 6);
+                });
+                
+                chordIndex = (chordIndex + 1) % chords.length;
+                setTimeout(playPad, 6000);
+            }
+            
+            playPad();
+        }
+
+        document.body.addEventListener('click', initAudio, { once: true });
+        document.body.addEventListener('touchstart', initAudio, { once: true });
+
+        // --- BACKGROUND PETALS ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let petals = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        for(let i=0; i<40; i++) {
+            petals.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                s: Math.random() * 2 + 1, // scale
+                a: Math.random() * 360,   // angle
+                sa: Math.random() * 2 - 1 // speed angle
+            });
+        }
+
+        function drawPetals() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            petals.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.a * Math.PI / 180);
+                
+                // Draw petal
+                ctx.fillStyle = 'rgba(253, 226, 228, 0.6)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(5*p.s, -5*p.s, 10*p.s, 0);
+                ctx.quadraticCurveTo(5*p.s, 5*p.s, 0, 0);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // Move
+                p.y += p.s * 0.5;
+                p.x += Math.sin(p.a * Math.PI/180) * 1;
+                p.a += p.sa;
+                
+                if(p.y > canvas.height + 20) {
+                    p.y = -20;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(drawPetals);
+        }
+        drawPetals();
+
+        // --- MODAL CONTROLS ---
+        const flowers = ['🌹', '🌸', '🌺', '🌻', '🌼', '🌷', '🪷', '🏵️', '💮', '💐'];
+        const winMessages = [
+            "Bintang saja tahu kalau kita ditakdirkan bersama.",
+            "Hatiku selalu aman kalau ada di dekatmu.",
+            "Kalimat yang paling indah adalah saat namamu disebut bersamaku.",
+            "Meskipun dingin, cintamu selalu bisa menghangatkanku.",
+            "Kamu selalu tahu kunci untuk masuk ke hatiku.",
+            "Detak jantung kita selalu seirama, kan?",
+            "Aku hanya ingin mengumpulkan kenangan manis denganmu.",
+            "Semua jalanku pada akhirnya selalu mengarah padamu.",
+            "Tidak ada memori tentangmu yang akan kubiarkan pudar.",
+            "Terima kasih sudah memberiku kesempatan."
+        ];
+
+        function showError(msg) {
+            document.getElementById('error-msg').innerText = msg;
+            document.getElementById('modal-error').classList.add('show');
+        }
+
+        function showWin(gameNum) {
+            document.getElementById('success-icon').innerText = flowers[gameNum - 1];
+            document.getElementById('success-msg').innerText = winMessages[gameNum - 1];
+            document.getElementById('modal-success').classList.add('show');
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
+        }
+
+        function winGame(num) {
+            if(num === 10) {
+                closeModals();
+                setTimeout(() => {
+                    document.getElementById('modal-final').classList.add('show');
+                    document.getElementById(`game-10`).classList.remove('active');
+                    document.getElementById(`game-10`).classList.add('completed');
+                }, 500);
+                return;
+            }
+            showWin(num);
+        }
+
+        function nextGame() {
+            closeModals();
+            document.getElementById(`game-${currentGame}`).classList.remove('active');
+            document.getElementById(`game-${currentGame}`).classList.add('completed');
+            
+            currentGame++;
+            if(currentGame <= 10) {
+                let next = document.getElementById(`game-${currentGame}`);
+                next.classList.add('active');
+                next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // --- GAME LOGICS ---
+
+        // G1: Constellation
+        (function() {
+            const g1c = document.getElementById('g1-canvas');
+            const g1ctx = g1c.getContext('2d');
+            const points = [{x:30,y:30}, {x:100,y:20}, {x:170,y:50}, {x:130,y:110}, {x:60,y:120}];
+            let clicked = 0;
+
+            function draw() {
+                g1ctx.clearRect(0,0,200,150);
+                // Draw lines
+                g1ctx.beginPath();
+                g1ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                g1ctx.lineWidth = 2;
+                for(let i=0; i<clicked; i++) {
+                    if(i===0) g1ctx.moveTo(points[i].x, points[i].y);
+                    else g1ctx.lineTo(points[i].x, points[i].y);
+                }
+                g1ctx.stroke();
+
+                // Draw points
+                points.forEach((p, i) => {
+                    g1ctx.beginPath();
+                    g1ctx.arc(p.x, p.y, 6, 0, Math.PI*2);
+                    g1ctx.fillStyle = i < clicked ? '#F1A7B8' : '#fff';
+                    g1ctx.fill();
+                    g1ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    g1ctx.font = '10px Arial';
+                    g1ctx.fillText(i+1, p.x-3, p.y-10);
+                });
+            }
+            draw();
+
+            g1c.addEventListener('click', (e) => {
+                if(currentGame !== 1) return;
+                const rect = g1c.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const target = points[clicked];
+                const dist = Math.hypot(x - target.x, y - target.y);
+                
+                if(dist < 15) {
+                    clicked++;
+                    draw();
+                    if(clicked === 5) {
+                        // Draw final line to close shape (star/heart abstract)
+                        g1ctx.lineTo(points[0].x, points[0].y);
+                        g1ctx.stroke();
+                        setTimeout(() => winGame(1), 500);
+                    }
+                } else {
+                    let clickedWrong = false;
+                    for(let i=clicked+1; i<5; i++){
+                        if(Math.hypot(x - points[i].x, y - points[i].y) < 15) clickedWrong = true;
+                    }
+                    if(clickedWrong) showError("Eh, urutannya harus dari 1, 2, 3 ya cantik.");
+                }
+            });
+        })();
+
+        // G2: Cups
+        (function() {
+            const cups = document.querySelectorAll('.cup');
+            let hasHeart = Math.floor(Math.random() * 3);
+            let locked = false;
+
+            cups.forEach((cup, idx) => {
+                cup.addEventListener('click', () => {
+                    if(currentGame !== 2 || locked) return;
+                    locked = true;
+                    if(idx === hasHeart) {
+                        cup.innerText = '💖';
+                        setTimeout(() => winGame(2), 600);
+                    } else {
+                        cup.innerText = '🥀';
+                        showError("Aduh salah bunga... hatiku bukan di situ sayang.");
+                        setTimeout(() => {
+                            cup.innerText = '🌷';
+                            locked = false;
+                            hasHeart = Math.floor(Math.random() * 3); // reshuffle
+                        }, 1500);
+                    }
+                });
+            });
+        })();
+
+        // G3: Words Order
+        (function() {
+            const targetSentence = ["Satu", "Satu", "nya", "Cintaku", "Hanya", "Kamu"];
+            // Simplified for logic:
+            const correctOrder = ["Satu", "Cintaku", "Hanya", "Kamu"];
+            const words = document.querySelectorAll('.word-piece');
+            const slots = document.querySelectorAll('.word-slot');
+            let currentSlot = 0;
+
+            words.forEach(word => {
+                word.addEventListener('click', () => {
+                    if(currentGame !== 3 || currentSlot >= 4 || word.style.opacity === '0') return;
+                    
+                    let text = word.innerText;
+                    if(text === correctOrder[currentSlot]) {
+                        slots[currentSlot].innerText = text;
+                        slots[currentSlot].style.border = 'none';
+                        slots[currentSlot].style.background = 'var(--blue-soft)';
+                        slots[currentSlot].style.display = 'flex';
+                        slots[currentSlot].style.alignItems = 'center';
+                        slots[currentSlot].style.justifyContent = 'center';
+                        slots[currentSlot].style.fontWeight = 'bold';
+                        slots[currentSlot].style.color = 'white';
+                        
+                        word.style.opacity = '0';
+                        currentSlot++;
+                        
+                        if(currentSlot === 4) setTimeout(() => winGame(3), 500);
+                    } else {
+                        showError("Susunannya belum pas, coba rasakan kalimatnya pelan-pelan.");
+                        // Reset
+                        currentSlot = 0;
+                        words.forEach(w => w.style.opacity = '1');
+                        slots.forEach(s => { s.innerText = ''; s.style.border = '2px dashed var(--pink-deep)'; s.style.background = 'transparent'; });
+                    }
+                });
+            });
+        })();
+
+        // G4: Warm Heart
+        (function() {
+            const heart = document.getElementById('g4-heart');
+            const prog = document.getElementById('g4-progress');
+            let heat = 0;
+
+            function rub() {
+                if(currentGame !== 4) return;
+                heat += 2;
+                if(heat > 100) heat = 100;
+                let filterVal = 1 - (heat/100);
+                heart.style.filter = `grayscale(${filterVal})`;
+                prog.innerText = `${heat}%`;
+                
+                if(heat === 100) {
+                    heart.style.color = 'var(--pink-deep)';
+                    heart.style.textShadow = '0 0 20px rgba(241, 167, 184, 0.8)';
+                    setTimeout(() => winGame(4), 500);
+                }
+            }
+            heart.addEventListener('mousemove', rub);
+            heart.addEventListener('touchmove', (e) => { e.preventDefault(); rub(); }, {passive:false});
+        })();
+
+        // G5: Lock
+        function checkG5() {
+            if(currentGame !== 5) return;
+            let v1 = document.getElementById('d1').value;
+            let v2 = document.getElementById('d2').value;
+            let v3 = document.getElementById('d3').value;
+            
+            if(v1 === '1' && v2 === '4' && v3 === '3') {
+                winGame(5);
+            } else {
+                showError("Hmm, coba ingat kode klasik yang artinya 'I Love You'. Terdiri dari jumlah huruf setiap katanya.");
+            }
+        }
+
+        // G6: Rhythm
+        let g6Score = 0;
+        function tapG6() {
+            if(currentGame !== 6) return;
+            const pulse = document.getElementById('g6-pulse');
+            // Check animation scale via computed style
+            const transform = window.getComputedStyle(pulse).getPropertyValue('transform');
+            // Rough logic: if it's large, win.
+            // Since parsing matrix is hard, we'll just use a CSS animation trick or simple timer.
+            // Better: use JS for animation state.
+        }
+        
+        // Rewrite G6 logic with JS for accuracy
+        (function() {
+            const circle = document.getElementById('g6-circle');
+            const pulse = document.getElementById('g6-pulse');
+            const scoreTxt = document.getElementById('g6-score');
+            
+            let scale = 1;
+            let growing = true;
+            
+            // Override css animation
+            pulse.style.animation = 'none';
+            
+            function animate() {
+                if(currentGame !== 6) { requestAnimationFrame(animate); return; }
+                
+                if(growing) scale += 0.02;
+                else scale -= 0.02;
+                
+                if(scale >= 1.8) growing = false;
+                if(scale <= 1) growing = true;
+                
+                pulse.style.transform = `scale(${scale})`;
+                pulse.style.opacity = 1 - ((scale-1)/0.8);
+                
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            circle.onclick = function() {
+                if(currentGame !== 6) return;
+                // Sweet spot is near 1.8
+                if(scale > 1.6) {
+                    g6Score++;
+                    scoreTxt.innerText = `${g6Score} / 3`;
+                    circle.style.borderColor = 'var(--blue-deep)';
+                    setTimeout(() => circle.style.borderColor = 'var(--pink-soft)', 200);
+                    if(g6Score === 3) setTimeout(() => winGame(6), 500);
+                } else {
+                    g6Score = 0;
+                    scoreTxt.innerText = `${g6Score} / 3`;
+                    showError("Detaknya belum pas sayang, tunggu lingkarannya paling besar ya.");
+                }
+            };
+        })();
+
+        // G7: Catch
+        (function() {
+            const area = document.getElementById('g7-area');
+            const btn = document.getElementById('g7-start');
+            const scoreTxt = document.getElementById('g7-score');
+            let score = 0;
+            let interval;
+            
+            btn.onclick = () => {
+                btn.style.display = 'none';
+                score = 0; scoreTxt.innerText = '0 / 5';
+                
+                interval = setInterval(() => {
+                    if(currentGame !== 7) { clearInterval(interval); return; }
+                    
+                    let item = document.createElement('div');
+                    item.className = 'falling-item';
+                    item.style.left = Math.random() * 80 + 10 + '%';
+                    item.style.top = '-30px';
+                    
+                    let isGood = Math.random() > 0.3;
+                    item.innerText = isGood ? '✨' : '☁️';
+                    item.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    
+                    item.onmousedown = item.ontouchstart = (e) => {
+                        e.preventDefault();
+                        if(isGood) {
+                            score++;
+                            scoreTxt.innerText = `${score} / 5`;
+                            item.remove();
+                            if(score >= 5) {
+                                clearInterval(interval);
+                                setTimeout(() => winGame(7), 500);
+                            }
+                        } else {
+                            clearInterval(interval);
+                            btn.style.display = 'block';
+                            area.querySelectorAll('.falling-item').forEach(el=>el.remove());
+                            showError("Aduh kena mendung, hindari awannya ya biar cerah terus.");
+                        }
+                    };
+                    
+                    area.appendChild(item);
+                    setTimeout(() => { if(item.parentNode) item.remove(); }, 4000);
+                    
+                }, 800);
+            };
+        })();
+
+        // G8: Wires (Rotate to form line)
+        (function() {
+            const tiles = document.querySelectorAll('.wire-tile');
+            let angles = [90, 0, 180]; // initial
+            
+            tiles.forEach((tile, idx) => {
+                tile.addEventListener('click', () => {
+                    if(currentGame !== 8) return;
+                    angles[idx] += 90;
+                    tile.style.transform = `rotate(${angles[idx]}deg)`;
+                    
+                    // Check win (all must be horizontal: 0 or 180 deg, technically ribbon looks same at 180? Wait, let's say all must be % 180 === 0)
+                    let w = true;
+                    angles.forEach(a => {
+                        if(a % 180 !== 0) w = false;
+                    });
+                    
+                    if(w) setTimeout(() => winGame(8), 500);
+                });
+            });
+        })();
+
+                // G9: Fade Text
+        (function() {
+            const txt = document.getElementById('g9-text');
+            let opacity = 0.1;
+            let timer;
+            
+            function startHold(e) {
+                if(currentGame !== 9) return;
+                e.preventDefault(); // Mencegah munculnya menu block/copy di HP
+                
+                // Saat ditahan, opacity akan bertambah pelan-pelan
+                timer = setInterval(() => {
+                    opacity += 0.05;
+                    txt.style.opacity = opacity;
+                    
+                    if(opacity >= 1) {
+                        clearInterval(timer);
+                        txt.style.color = 'var(--pink-deep)';
+                        txt.style.fontWeight = 'bold';
+                        txt.style.fontSize = '18px';
+                        setTimeout(() => winGame(9), 500);
+                    }
+                }, 100); // Kecepatan teks muncul (100ms)
+            }
+            
+            function stopHold() {
+                // Berhenti memunculkan teks jika jari dilepas
+                clearInterval(timer);
+            }
+            
+            // Event untuk HP (Touch) dan Komputer (Mouse)
+            txt.addEventListener('mousedown', startHold);
+            txt.addEventListener('touchstart', startHold, {passive: false});
+            
+            txt.addEventListener('mouseup', stopHold);
+            txt.addEventListener('mouseleave', stopHold);
+            txt.addEventListener('touchend', stopHold);
+        })();
+
+
+        // G10: Runaway Button
+        (function() {
+            const btnNo = document.getElementById('g10-btn-no');
+            
+            function moveAway() {
+                if(currentGame !== 10) return;
+                const rx = (Math.random() - 0.5) * 150;
+                const ry = (Math.random() - 0.5) * 100;
+                btnNo.style.transform = `translate(${rx}px, ${ry}px)`;
+            }
+            
+            btnNo.addEventListener('mouseover', moveAway);
+            btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); moveAway(); }, {passive:false});
+            btnNo.addEventListener('click', () => {
+                showError("Gak boleh klik yang ini, aku maunya diucapin iya.");
+            });
+        })();
+
+    </script>
+</body>
+</html>
+
+```
